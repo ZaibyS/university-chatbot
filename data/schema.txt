@@ -1,0 +1,170 @@
+Table Name: Departments
+Table Description: This table contains information about departments, including their unique identifiers, names, and abbreviations.
+Columns: Following are the coloumns of the Table Name Departents
+Column: DepartmentID, Type: INTEGER, Mode: REQUIRED, Description: A unique identifier assigned to each department. This serves as the primary key for the Departments table.
+Column: Name, Type: STRING, Mode: REQUIRED, Description: The name of the department.
+Column: Abbrevation, Type: STRING, Mode: REQUIRED, Description: The abbreviation of the department name.
+Data Definition Language:
+`CREATE TABLE Departments (
+    DepartmentID INTEGER NOT NULL PRIMARY KEY,
+    Name STRING NOT NULL,
+    Abbrevation STRING NOT NULL
+);`
+Relationships of Table Name Departents with other Tables:
+The Departments table's DepartmentID column serves as the primary key and is referenced as a foreign key in the Students table's DepartmentID column, the Instructors table's DepartmentID column, and the Courses_Semester table's DepartmentID column.
+
+
+Table Name: Students
+Table Description: This table stores information about students, including their unique identifiers, names, warning counts, and associated department details.
+Columns: Following are the coloumns of the Table Name Students
+Column: RollNo, Type: STRING, Mode: REQUIRED, Description: A unique identifier assigned to each student. This serves as the primary key for the Students table. 
+Column: Name, Type: STRING, Mode: REQUIRED, Description: The full name of the student.
+Column: WarningCount, Type: INTEGER, Mode: NULLABLE, Description: The count of warnings issued to a student. Defaults to zero. A warning is added when a student's CGPA falls below 2.
+Column: DepartmentID, Type: INTEGER, Mode: REQUIRED, Description: The identifier of the department to which the student belongs. This is a foreign key referencing the Departments table.
+Data Definition Language:
+`CREATE TABLE Students (
+    RollNo STRING NOT NULL PRIMARY KEY,
+    Name STRING NOT NULL,
+    WarningCount INTEGER DEFAULT 0,
+    DepartmentID INTEGER NOT NULL,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);`
+Relationships of Table Name Students with other Tables:
+The Students table's RollNo column serves as the primary key and is referenced as a foreign key in the Registration table's RollNumber column and the ChallanForm table's RollNumber column. Additionally, the Students table's DepartmentID column is a foreign key referencing the DepartmentID column in the Departments table.
+
+
+Table Name: Courses
+Table Description: This table contains information about courses, including their unique identifiers, names, prerequisites, and credit hours.
+Columns: Following are the coloumns of the Table Name Courses
+Column: CourseID, Type: INTEGER, Mode: REQUIRED, Description: A unique identifier assigned to each course. This serves as the primary key for the Courses table. 
+Column: CourseName, Type: STRING, Mode: REQUIRED, Description: The name of the course.
+Column: PrerequiteCourseID, Type: INTEGER, Mode: NULLABLE, Description: The CourseID of the prerequisite course. This references the CourseID column in the same Courses table.
+Column: CreditHours, Type: INTEGER, Mode: REQUIRED, Description:  The total number of credit hours assigned to the course.
+Data Definition Language:
+`CREATE TABLE Courses (
+    CourseID INTEGER NOT NULL PRIMARY KEY,
+    CourseName STRING NOT NULL,
+    PrerequiteCourseID INTEGER,
+    CreditHours INTEGER NOT NULL,
+    FOREIGN KEY (PrerequiteCourseID) REFERENCES Courses(CourseID)
+);`
+Relationships of Table Name Courses with other Tables:
+The Courses table's CourseID column serves as the primary key and is referenced as a foreign key in the Courses table's PrerequiteCourseID column (self-referencing for prerequisites), the Courses_Semester table's CourseID column, and the Registration table's CourseID column.
+
+
+Table Name: Instructors
+Table Description: This table contains information about instructors, including their unique identifiers, names, and associated departments.
+Columns: Following are the coloumns of the Table Name Instructors
+Column: InstructorID, Type: INTEGER, Mode: REQUIRED, Description: A unique identifier assigned to each instructor. This serves as the primary key for the Instructors table. 
+Column: Name, Type: STRING, Mode: REQUIRED, Description: The full name of the instructor.
+Column: DepartmentID, Type: INTEGER, Mode: NULLABLE, Description: The identifier of the department to which the instructor belongs. This is a foreign key referencing the Departments table.
+Data Definition Language:
+`CREATE TABLE Instructors (
+    InstructorID INTEGER NOT NULL PRIMARY KEY,
+    Name STRING NOT NULL,
+    DepartmentID INTEGER,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);`
+Relationships of Table Name Instructors with other Tables:
+The Instructors table's InstructorID column serves as the primary key and is referenced as a foreign key in the Courses_Semester table's InstructorID column. The Instructors table's DepartmentID column is also a foreign key referencing the DepartmentID column in the Departments table.
+
+
+Table Name: Semester
+Table Description: This table contains information about academic semesters, including their names and statuses.
+Columns: Following are the coloumns of the Table Name  Semester
+Column: Semester, Type: STRING, Mode: REQUIRED, Description: The name or identifier for the semester (e.g., "Fall 2025", "Spring 2026").
+Column: StatusID, Type: INTEGER, Mode: REQUIRED, Description: The current status of the semester. This is a foreign key referencing the StatusID column in the SemesterStatus table.
+Data Definition Language:
+`CREATE TABLE Semester (
+    Semester STRING NOT NULL PRIMARY KEY,
+    StatusID INTEGER NOT NULL,
+    FOREIGN KEY (StatusID) REFERENCES SemesterStatus(StatusID)
+);`
+Relationships of Table Name Semester with other Tables:
+The Semester table's Semester column serves as the primary key and is referenced as a foreign key in the Courses_Semester table's Semester column, the Registration table's Semester column, and the ChallanForm table's Semester column. The Semester table's StatusID column is a foreign key referencing the StatusID column in the SemesterStatus table.
+
+
+Table Name: SemesterStatus
+Table Description: This table contains information about possible statuses for academic semesters.
+Columns: Following are the coloumns of the Table Name SemesterStatus
+Column: StatusID, Type: INTEGER, Mode: REQUIRED, Description: A unique identifier for each semester status and is the primary key for this table.
+Column: StatusDescription, Type: STRING, Mode: REQUIRED, Description: The status of the semester, such as "Complete", "InProgress" or "Cancelled".
+Data Definition Language:
+`CREATE TABLE SemesterStatus (
+    StatusID INTEGER NOT NULL PRIMARY KEY,
+    StatusDescription STRING NOT NULL
+);`
+Relationships of Table Name SemesterStatus with other Tables:
+The SemesterStatus table's StatusID column serves as the primary key and is referenced as a foreign key in the Semester table's StatusID column.
+
+
+Table Name: Courses_Semester
+Table Description: This table contains information about courses offered in specific semesters, including details about instructors, sections, seat availability, and associated departments.
+Columns: Following are the coloumns of the Table Name Courses_Semester
+Column: InstructorID, Type: INTEGER, Mode: REQUIRED, Description: Foreign key referencing the InstructorID column in the Instructors table.
+Column: CourseID, Type: INTEGER, Mode: REQUIRED, Description: Foreign key referencing the CourseID column in the Courses table.
+Column: Semester, Type: STRING, Mode: REQUIRED, Description: Foreign key referencing the Semester column in the Semester table
+Column: Section, Type: STRING, Mode: REQUIRED, Description: The section of the course (e.g., "A", "B").
+Column: AvailableSeats, Type: INTEGER, Mode: REQUIRED, Description: The number of seats available for this course section in the semester.
+Column: DepartmentID, Type: INTEGER, Mode: REQUIRED, Description: Foreign key referencing the DepartmentID column in the Departments table.
+Data Definition Language:
+`CREATE TABLE Courses_Semester (
+    InstructorID INTEGER NOT NULL,
+    CourseID INTEGER NOT NULL,
+    Semester STRING NOT NULL,
+    Section STRING NOT NULL,
+    AvailableSeats INTEGER NOT NULL,
+    DepartmentID INTEGER NOT NULL,
+    PRIMARY KEY (InstructorID, CourseID, Semester, Section),
+    FOREIGN KEY (InstructorID) REFERENCES Instructors(InstructorID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID),
+    FOREIGN KEY (Semester) REFERENCES Semester(Semester),
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);`
+Relationships of Table Name Courses_Semester with other Tables:
+The Courses_Semester table has a composite primary key comprising the InstructorID, CourseID, Semester, and Section columns. The InstructorID column in this table is a foreign key referencing the InstructorID column in the Instructors table. The CourseID column is a foreign key referencing the CourseID column in the Courses table. The Semester column is a foreign key referencing the Semester column in the Semester table. The DepartmentID column is a foreign key referencing the DepartmentID column in the Departments table.
+
+
+Table Name: Registration
+Table Description: This table contains information about students' course registrations in specific semesters, including their section and GPA.
+Columns: Following are the coloumns of the Table Name Registration
+Column: Semester, Type: STRING, Mode: REQUIRED, Description:  Foreign key referencing the Semester column in the Semester table.
+Column: RollNumber, Type: STRING, Mode: REQUIRED, Description: Foreign key referencing the RollNo column in the Students table.
+Column: CourseID, Type: INTEGER, Mode: REQUIRED, Description:  Foreign key referencing the CourseID column in the Courses table.
+Column: Section, Type: STRING, Mode: REQUIRED, Description: The section of the course (e.g., "A", "B").
+Column: GPA, Type: FLOAT, Mode: REQUIRED, Description: The GPA of the student in the course.
+Data Definition Language:
+`CREATE TABLE Registration (
+    Semester STRING NOT NULL,
+    RollNumber STRING NOT NULL,
+    CourseID INTEGER NOT NULL,
+    Section STRING NOT NULL,
+    GPA FLOAT NOT NULL,
+    PRIMARY KEY (Semester, RollNumber, CourseID, Section),
+    FOREIGN KEY (Semester) REFERENCES Semester(Semester),
+    FOREIGN KEY (RollNumber) REFERENCES Students(RollNo),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+);`
+Relationships of Table Name Registration with other Tables:
+The Registration table has a composite primary key comprising the Semester, RollNumber, CourseID, and Section columns. The Semester column in this table is a foreign key referencing the Semester column in the Semester table. The RollNumber column is a foreign key referencing the RollNo column in the Students table. The CourseID column is a foreign key referencing the CourseID column in the Courses table.
+
+
+Table Name: ChallanForm
+Table Description: This table contains information about challan forms issued to students, including details about the semester, total dues, and payment status.
+Columns: Following are the coloumns of the Table Name ChallanForm
+Column: Semester, Type: STRING, Mode: REQUIRED, Description:  Foreign key referencing the Semester column in the Semester table.
+Column: RollNumber, Type: STRING, Mode: REQUIRED, Description: Foreign key referencing the RollNo column in the Students table.
+Column: TotalDues, Type: INTEGER, Mode: REQUIRED, Description: The total dues for the student for the specified semester.
+Column: Status, Type: STRING, Mode: REQUIRED, Description: The status of the challan, such as "Paid" or "Pending".
+Data Definition Language:
+`CREATE TABLE ChallanForm (
+    Semester STRING NOT NULL,
+    RollNumber STRING NOT NULL,
+    TotalDues INTEGER NOT NULL,
+    Status STRING NOT NULL,
+    PRIMARY KEY (Semester, RollNumber),
+    FOREIGN KEY (Semester) REFERENCES Semester(Semester),
+    FOREIGN KEY (RollNumber) REFERENCES Students(RollNo)
+);`
+Relationships of Table Name ChallanForm with other Tables:
+The ChallanForm table has a composite primary key comprising the Semester and RollNumber columns. The Semester column in this table is a foreign key referencing the Semester column in the Semester table. The RollNumber column is a foreign key referencing the RollNo column in the Students table.
